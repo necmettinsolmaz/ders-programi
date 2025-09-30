@@ -18,6 +18,8 @@ export const initialAppState: IAppState = {
 export type AppActions = 
     | { type: 'ADD_TEACHER'; payload: TeacherName }
     | { type: 'REMOVE_TEACHER'; payload: TeacherName }
+    | { type: 'ADD_CLASS'; payload: ClassName } // YENİ EYLEM
+    | { type: 'REMOVE_CLASS'; payload: ClassName } // YENİ EYLEM
     // Diğer tüm eylemler buraya eklenecektir (ADD_CLASS, ADD_COURSE, vb.)
     ;
 
@@ -44,7 +46,21 @@ export const scheduleReducer = (state: IAppState, action: AppActions): IAppState
                 teachers: state.teachers.filter(t => t !== action.payload),
                 // Not: Kural ve program verilerini de güncellememiz gerekecek, ancak şimdilik basit tutuyoruz.
             };
+             case 'ADD_CLASS':
+            if (state.classes.includes(action.payload)) {
+                return state; 
+            }
+            return {
+                ...state,
+                classes: [...state.classes, action.payload],
+            };
 
+        case 'REMOVE_CLASS':
+            return {
+                ...state,
+                classes: state.classes.filter(c => c !== action.payload),
+                // Not: Sınıf silindiğinde program ve kurallar da temizlenmelidir.
+            };
         // Diğer case'ler (sınıf, ders, kural ekleme/silme) daha sonra eklenecek.
         default:
             return state;

@@ -1,9 +1,13 @@
+
 // src/app/components/molecules/Sidebar.tsx
-'use client';
+
 
 import React, { useState } from 'react';
 import Heading from '../atoms/Heading';
 import Tab from './Tab';
+import TeacherForm from './TeacherForm'; 
+import ClassForm from './ClassForm';
+
 
 // Sekmelerimizi tanımlıyoruz
 const tabs = [
@@ -20,9 +24,9 @@ const Sidebar: React.FC = () => {
   const renderTabContent = () => {
     switch (activeTab) {
       case 'teachers':
-        return <div>Öğretmen Yönetimi Formu Buraya Gelecek.</div>;
+        return <TeacherForm />; 
       case 'classes':
-        return <div>Sınıf Yönetimi Formu Buraya Gelecek.</div>;
+        return <ClassForm />; 
       case 'courses':
         return <div>Ders ve Saat Yönetimi Formu Buraya Gelecek.</div>;
       case 'rules':
@@ -33,7 +37,7 @@ const Sidebar: React.FC = () => {
   };
 
   return (
-    <div className="w-full bg-white shadow-xl rounded-lg p-4 h-full flex flex-col">
+    <div className="w-full bg-white shadow-2xl rounded-xl p-6 h-full flex flex-col"> 
       <Heading level={2} className="!mb-0 !pb-2">Veri Girişleri ve Kurallar</Heading>
       
       {/* Sekme Başlıkları */}
