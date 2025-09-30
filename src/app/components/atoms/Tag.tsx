@@ -1,28 +1,50 @@
-// src/components/atoms/Tag.tsx
+// src/app/components/atoms/Tag.tsx (GÜNCELLENDİ: Badge özelliği eklendi)
 
 import React from 'react';
 
 interface TagProps {
-  children: React.ReactNode; // Etiketin içindeki içerik (Örn: "Matematik")
-  onRemove?: () => void; // Silme butonu tıklandığında çalışacak fonksiyon
-  className?: string; // Ekstra stil sınıfları
+  children: React.ReactNode; 
+  onRemove?: () => void;
+  className?: string; 
+  badgeContent?: string | number; // YENİ: İsteğe bağlı rozet içeriği
 }
 
-const Tag: React.FC<TagProps> = ({ children, onRemove, className = '' }) => {
+const Tag: React.FC<TagProps> = ({ children, onRemove, badgeContent, className = '' }) => {
+  // onRemove varsa tag'in sağ boşluğu 6, badge varsa 8 olmalı (çift kontrol)
+  const paddingRight = onRemove && badgeContent ? 'pr-10' : (onRemove ? 'pr-6' : (badgeContent ? 'pr-5' : 'pr-3'));
+  
   return (
     <span 
-      // Tailwind ile projenizin temel stillerine uygun hale getirildi (Vanilla CSS'teki .tag stiline benzer)
-      className={`inline-flex items-center text-sm font-medium px-3 py-1 rounded-full mr-2 mb-2 whitespace-nowrap
-        ${onRemove ? 'pr-6' : ''} 
-        bg-teal-100 text-teal-800 relative shadow-sm ${className}`}
+      // rounded-lg ve temel stiller
+      className={`inline-flex items-center text-sm font-medium py-1 mr-2 mb-2 whitespace-nowrap
+        bg-teal-500 text-white relative shadow-sm rounded-lg ${className} ${paddingRight}`}
     >
-      {children}
+      
+      {/* Etiket Metni */}
+      <span className="pl-3 pr-2">
+        {children}
+      </span>
+
+      {/* ROZET / BADGE EKLENDİ */}
+      {badgeContent && (
+        <span 
+          // Saati gösteren küçük ve şık rozet stili
+          className="absolute right-0 top-0 bottom-0 text-xs font-bold flex items-center justify-start 
+                     bg-teal-700 text-white py-1 px-1.5 rounded-r-lg"
+          style={{ width: onRemove ? '2.5rem' : 'auto' }} // Silme butonu varsa daha geniş alan bırak
+        >
+            {badgeContent}
+        </span>
+      )}
+
+      {/* Silme Butonu */}
       {onRemove && (
-        // Silme butonu (Vanilla JS'teki .remove-item-btn stilini yakaladık)
         <button
           type="button"
           onClick={onRemove}
-          className="absolute top-0.5 right-0.5 ml-2 p-0.5 rounded-full bg-red-500 text-white leading-none text-xs w-4 h-4 hover:bg-red-600 transition-colors flex items-center justify-center"
+          className="absolute right-1 top-1/2 transform -translate-y-1/2 ml-2 p-0.5 rounded-full 
+                     bg-red-600 text-white leading-none text-xs w-4 h-4 hover:bg-red-700 transition-colors 
+                     flex items-center justify-center z-10" // z-10 ile badge'in önünde kalmasını sağladık
           aria-label="Kaldır"
         >
           x
