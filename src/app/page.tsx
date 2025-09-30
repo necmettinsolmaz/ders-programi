@@ -3,31 +3,30 @@
 
 import Heading from './components/atoms/Heading';
 import Sidebar from './components/molecules/Sidebar';
+import Scheduler from './components/organisms/Scheduler';
+import ScheduleProvider from './state/ScheduleProvider';
 
 export default function HomePage() {
   return (
-    <div className="min-h-screen bg-gray-50 p-6">
+    // Arka planı biraz daha koyu yapıp, iç içeriği beyaz ve gölgeli tutarak kontrastı artırdık
+    <div className="min-h-screen bg-gray-100 p-8"> 
       <div className="max-w-7xl mx-auto">
         
-        {/* Başlık */}
         <Heading level={1} className="text-center text-gray-800">
           Haftalık Ders Programı Yöneticisi (Geliştirilmiş V4)
         </Heading>
 
-        <div className="mt-6 flex gap-6 h-[calc(100vh-10rem)]">
+        <div className="mt-8 flex gap-8 h-[calc(100vh-8rem)]">
           
-          {/* 1. Kenar Çubuğu (Veri Giriş ve Kurallar) */}
+          {/* Kenar Çubuğu */}
           <div id="sidebar" className="w-1/3 min-w-[350px]">
-            <Sidebar />
+            {/* Sidebar bileşeni içindeki gölgeyi Sidebar.tsx'te tanımladık */}
+            <Sidebar /> 
           </div>
 
-          {/* 2. Ana İçerik (Program Tablosu) */}
-          <div id="main-content" className="w-2/3 flex-grow bg-white shadow-xl rounded-lg p-6 overflow-hidden">
-            <Heading level={2} className="!mb-4">Haftalık Ders Programı Tablosu</Heading>
-            <div className="table-container h-full overflow-y-auto">
-                {/* Program Tablosu Bileşeni Buraya Gelecek */}
-                <p className="text-gray-500">Öğretmen ve sınıfları tanımladıktan sonra program tablosu burada görüntülenecektir.</p>
-            </div>
+          {/* Ana İçerik (Program Tablosu) */}
+          <div id="main-content" className="w-2/3 flex-grow bg-white shadow-2xl rounded-xl p-4 overflow-y-auto">
+            <Scheduler /> 
           </div>
         </div>
       </div>
