@@ -1,7 +1,7 @@
 // src/app/state/ScheduleProvider.tsx
 'use client';
 
-import React, { createContext, useReducer, useContext, ReactNode } from 'react';
+import React, { createContext, useReducer, useContext, ReactNode,useEffect} from 'react';
 import { IAppState } from '../lib/types/scheduleTypes';
 import { scheduleReducer, initialAppState, AppActions } from './scheduleReducer';
 
@@ -18,11 +18,34 @@ export const ScheduleContext = createContext<ScheduleContextType | undefined>(un
 interface ScheduleProviderProps {
     children: ReactNode;
 }
+const LOCAL_STORAGE_KEY = 'dersProgramiState';
 
 export const ScheduleProvider: React.FC<ScheduleProviderProps> = ({ children }) => {
     // useReducer Hook'u ile durum ve dispatch fonksiyonu oluşturulur
-    const [state, dispatch] = useReducer(scheduleReducer, initialAppState);
-
+    const [state, dispatch] = useReducer(scheduleReducer, initialAppState, (initial) => {
+    // 1. İLK BAŞLATMA: LocalStorage'dan yükle
+    if (typeof window !== 'undefined') {
+      const storedState = localStorage.getItem(LOCAL_STORAGE_KEY);
+      if (storedState) {
+        try {
+          // JSON.parse başarılı olursa saklanan veriyi döndür
+          return JSON.parse(storedState);
+        } catch (e) {
+          console.error("Local storage verisi bozuk:", e);
+          // Hata olursa varsayılan başlangıç durumunu kullan
+          return initial; 
+        }
+      }
+    }
+    // Veri yoksa veya sunucuda (SSR) çalışıyorsa varsayılan durumu kullan
+    return initial;
+    });
+     // 2. STATE DEĞİŞİKLİĞİ: Her state değiştiğinde LocalStorage'a kaydet
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
+    }
+  }, [state]);
     return (
         <ScheduleContext.Provider value={{ state, dispatch }}>
             {children}
@@ -38,3 +61,4 @@ export const useSchedule = () => {
     }
     return context;
 };
+export default ScheduleProvider
