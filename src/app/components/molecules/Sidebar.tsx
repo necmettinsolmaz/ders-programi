@@ -1,13 +1,16 @@
+// src/app/components/molecules/Sidebar.tsx (GÜNCEL HALİ: useSchedule ve Toast Entegrasyonu)
 
-// src/app/components/molecules/Sidebar.tsx
-
-
+'use client';
 import React, { useState } from 'react';
 import Heading from '../atoms/Heading';
 import Tab from './Tab';
 import TeacherForm from './TeacherForm'; 
 import ClassForm from './ClassForm';
-
+import CourseForm from './CourseForm';
+import RuleForm from './RuleForm';
+import { useToast } from '@/app/state/ToastProvider'; 
+import { useSchedule } from '@/app/state/ScheduleProvider'; // YENİ IMPORT
+import { IAssignmentRule } from '@/app/lib/types/scheduleTypes'; // YENİ IMPORT
 
 // Sekmelerimizi tanımlıyoruz
 const tabs = [
@@ -18,8 +21,27 @@ const tabs = [
 ];
 
 const Sidebar: React.FC = () => {
-  // Aktif sekmeyi tutmak için yerel state (şimdilik)
+  // Hook'ları al
+  const { state, dispatch } = useSchedule(); // Dispatch için useSchedule gerekli
+  const { addToast } = useToast(); 
+  
+  // Aktif sekmeyi tutmak için yerel state
   const [activeTab, setActiveTab] = useState(tabs[0].id);
+
+  // Kural ekleme işleyicisi (RuleForm'a gönderilecek)
+  const handleAddRule = (newRule: IAssignmentRule) => {
+    // 1. Dispatch ile kuralı ekle
+    dispatch({ type: 'ADD_RULE', payload: newRule });
+    
+    // 2. Başarı bildirimini göster
+    addToast('Yeni atama kuralı başarıyla eklendi.', 'success');
+  };
+  
+  // Kural kaldırma işleyicisi (RuleForm'a gönderilecek)
+  const handleRemoveRule = (ruleId: string, ruleName: string) => {
+    dispatch({ type: 'REMOVE_RULE', payload: ruleId });
+    addToast(`Kural başarıyla kaldırıldı: ${ruleName}`, 'info');
+  };
 
   const renderTabContent = () => {
     switch (activeTab) {
@@ -28,9 +50,15 @@ const Sidebar: React.FC = () => {
       case 'classes':
         return <ClassForm />; 
       case 'courses':
-        return <div>Ders ve Saat Yönetimi Formu Buraya Gelecek.</div>;
+        return <CourseForm />; 
       case 'rules':
-        return <div>Atama Kuralı Tanımlama Formu Buraya Gelecek.</div>;
+        // RuleForm'a gerekli prop'ları gönder
+        return (
+            <RuleForm 
+                onAddRule={handleAddRule} 
+                onRemoveRule={handleRemoveRule}
+            />
+        ); 
       default:
         return null;
     }
