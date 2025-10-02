@@ -68,9 +68,9 @@ const RuleForm: React.FC = () => {
     dispatch({ type: 'ADD_RULE', payload: newRule }); 
     
     // Formu temizle
-    setSelectedTeacher('');
-    setSelectedClass('');
-    setSelectedCourse('');
+    //setSelectedTeacher('');
+    //setSelectedClass('');
+    //setSelectedCourse('');
     setError('');
   };
 

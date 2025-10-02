@@ -14,7 +14,7 @@ interface FormFieldProps {
 
 const FormField: React.FC<FormFieldProps> = ({ label, id, errorMessage, inputProps, className = '' }) => {
   return (
-    <div className={`mb-4 ${className}`}>
+    <div className={`mb-2 ${className}`}>
       {/* Label Atomu */}
       <label htmlFor={id} className="block text-sm font-medium text-gray-700 mb-1">
         {label}

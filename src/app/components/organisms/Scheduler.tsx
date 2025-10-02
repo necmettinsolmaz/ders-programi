@@ -1,21 +1,21 @@
-// src/app/components/organisms/Scheduler.tsx (GÜNCELLENMİŞ VE OPTİMİZE EDİLMİŞ)
+// src/app/components/organisms/Scheduler.tsx (GÜNCELLENDİ: Atama Mantığı ve Hook Entegrasyonu)
 'use client';
 
 import React from 'react';
-import { DAYS_OF_WEEK, PERIODS } from '@/app/lib/constants'; // DAYS_OF_WEEK: 6, PERIODS: 12
+import { DAYS_OF_WEEK, PERIODS } from '@/app/lib/constants';
 import Heading from '../atoms/Heading';
-import { useSchedule } from '@/app/state/ScheduleProvider'; 
+import { useSchedule } from '@/app/state/ScheduleProvider';
+import { useScheduleSlot } from '@/app/hooks/useScheduleSlot'; // YENİ HOOK İMPORT EDİLDİ
 
 const Scheduler: React.FC = () => {
   const { state } = useSchedule();
   
-  // Başlık (th) stili: Padding ve font minimuma indirildi
+  // Stiller aynı kalacak
   const headerStyle = "p-1.5 border text-center text-xs font-semibold bg-gray-100 text-gray-700 uppercase tracking-wider";
-  
-  // Hücre (td) stili: Padding ve yükseklik minimuma indirildi, font çok küçük
-  const cellStyle = "p-1 border border-gray-200 h-10 align-top text-[0.6rem] leading-none"; 
+  // Hücre stilini biraz değiştiriyoruz (h-14)
+  const cellStyle = "p-1 border border-gray-200 h-14 align-top text-[0.6rem] leading-none transition duration-150 relative"; 
 
-  // Dinamik sütun genişliği hesaplaması (1 köşe sütunu + 6 gün sütunu)
+  // Dinamik sütun genişliği hesaplaması
   const dayColumnWidth = `w-[calc(100%/${DAYS_OF_WEEK.length + 1})]`; 
 
   return (
@@ -54,13 +54,91 @@ const Scheduler: React.FC = () => {
                 </td>
                 
                 {/* Gün Hücreleri (Ders Atamaları) */}
-                {DAYS_OF_WEEK.map(day => (
-                  // Hücrelerin benzersiz anahtarı: Örneğin 1. Saat Salı Günü
-                  <td key={`${period}-${day}`} className={cellStyle}>
-                    {/* Buraya ders atamaları (MAT-10A / Ayşe) gelecek */}
-                    <span className="text-gray-400"></span>
-                  </td>
-                ))}
+                {DAYS_OF_WEEK.map(day => {
+                    // **Kritik Kısım: Her hücre için Hook kullanma**
+                    const { slot, 
+                        isAssigned, 
+                        unassignSlot, 
+                        handleDragOver, 
+                        handleDrop,
+                        handleDragEnter, 
+                        handleDragLeave,   
+                        isDraggingOver 
+                    } = useScheduleSlot(day, period);
+                    
+                    // Hücre dolduğunda atanmış bilgileri
+                    const courseInfo = isAssigned ? 
+                        `${slot.course} (${slot.class})` : 
+                        null;
+                    const teacherInfo = isAssigned ? slot.teacher : null;
+                    // YENİ: Vurgulama sınıfını dinamik olarak belirle
+                    let tdClass = isAssigned 
+                        ? 'bg-teal-100 hover:bg-teal-200' 
+                        : 'hover:bg-gray-100';
+                    
+                    if (isDraggingOver) {
+                        // Eğer sürükleniyorsa, yeşil bir halka ile vurgula
+                        tdClass = 'bg-green-100 border-2 border-green-500 ring-2 ring-green-500'; 
+                    }
+                    return (
+    <td 
+        key={`${period}-${day}`} 
+        className={`${cellStyle} ${tdClass}`} 
+        onDragOver={handleDragOver}
+        onDrop={handleDrop} 
+        onDragEnter={handleDragEnter}  
+        onDragLeave={handleDragLeave}     
+    >
+        {isAssigned ? (
+            // isAssigned olduğu durum: Sürüklemeyi bu div'e ekliyoruz
+            <div 
+                className="w-full text-xs cursor-move hover:bg-teal-500 transition-colors relative group"                
+                // *** SÜRÜKLEME ÖZELLİKLERİ EKLENDİ ***
+                draggable={true}
+                onDragStart={(e) => {
+                    // Taşıma verilerini buraya yerleştiriyoruz
+                    e.dataTransfer.setData("moveSlotId", slot.id); 
+                    e.dataTransfer.setData("moveDay", slot.day); 
+                    e.dataTransfer.setData("movePeriod", slot.period.toString()); 
+                    e.currentTarget.classList.add('opacity-40', 'border-dashed'); 
+                }}
+                onDragEnd={(e) => {
+                    e.currentTarget.classList.remove('opacity-40', 'border-dashed');
+                }}
+                // *** SÜRÜKLEME ÖZELLİKLERİ EKLENDİ ***
+
+                onClick={unassignSlot} // Tıklayarak silme hala çalışsın
+            >
+                {/* Ders Adı ve Sınıf (slot nesnesinden çekilmeli) */}
+                <span className="font-bold block truncate">
+                    {slot.class}-{slot.course} 
+                </span>
+                
+                {/* Öğretmen Adı */}
+                <span className="text-[0.6rem] block truncate">
+                    {slot.teacher}
+                </span>
+                
+                {/* Silme butonu (Mouse üzerine gelince görünür) */}
+                <span 
+                    className="absolute top-0 right-0 p-1 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 text-xs z-10"
+                    // Silme butonuna tıklandığında *sadece* silme fonksiyonu çalışmalı, sürükleme olayları etkilenmemeli.
+                    onClick={(e) => {
+                        e.stopPropagation(); // Parent div'in onClick'ini (unassignSlot) engelle
+                        unassignSlot();
+                    }}
+                >
+                    X
+                </span>
+            </div>
+        ) : (
+            <span className="text-gray-400 text-[0.5rem]">
+                (Boş)
+            </span>
+        )}
+    </td>
+);
+                })}
               </tr>
             ))}
           </tbody>

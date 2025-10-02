@@ -51,5 +51,16 @@ export interface IAppState {
     courses: ICourse[];
     assignmentRules: IAssignmentRule[];
     scheduleData: ScheduleData;
+    schedule: IScheduleSlot[];
     // Uygulama ayarları eklenebilir (Örn: maxDailyHours: 8)
+}
+// Tabloya yapılan tek bir ders atamasını temsil eder
+export interface IScheduleSlot {
+    id: string;        // Benzersiz slot ID'si (Silme/Güncelleme için)
+    ruleId: string;    // Atanan kuralın ID'si
+    teacher: string;   // Öğretmen adı (Hücrede göstermek için)
+    class: string;     // Sınıf adı (Hücrede göstermek için)
+    course: string;    // Ders adı (Hücrede göstermek için)
+    day: string;       // Hangi gün (Örn: "Salı")
+    period: number;    // Hangi saat (Örn: 5)
 }

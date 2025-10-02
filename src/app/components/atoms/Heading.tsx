@@ -1,26 +1,24 @@
-// src/components/atoms/Heading.tsx
+// src/app/components/atoms/Heading.tsx (GÜNCELLENDİ)
 
 import React from 'react';
 
-// Tip güvenliği için hangi seviyelerin kabul edileceğini tanımlıyoruz
 type HeadingLevel = 1 | 2 | 3 | 4 | 5 | 6;
 
 interface HeadingProps extends React.HTMLAttributes<HTMLHeadingElement> {
-  level: HeadingLevel; // h1, h2, h3...
+  level: HeadingLevel; 
   children: React.ReactNode;
   className?: string;
 }
 
 const Heading: React.FC<HeadingProps> = ({ level, children, className = '', ...rest }) => {
-  // Seviyeye göre doğru HTML etiketini dinamik olarak seçeriz
   const Tag = `h${level}` as keyof JSX.IntrinsicElements;
 
-  // Seviyeye göre temel boyutlandırmayı Tailwind ile ayarlayalım
+  // Modern stil güncellemeleri
   const baseStyles = {
-    1: 'text-3xl font-bold mb-6',
-    2: 'text-xl font-semibold mb-4 border-b pb-2', // Sidebar'daki h2'ler için ideal
-    3: 'text-lg font-semibold mb-3',
-    // Diğer seviyeler için varsayılan boyutlar
+    1: 'text-3xl font-extrabold text-gray-900 mb-8 border-b border-gray-100 pb-2', // Uygulama ana başlığı
+    2: 'text-xl font-bold text-gray-800 mb-4', // Bölüm başlıkları (Sidebar, Tablo)
+    3: 'text-lg font-semibold text-gray-700 mb-3', // Form/Liste başlıkları
+    4: 'text-base font-medium text-gray-600 mb-2',
   }[level];
 
   return (
